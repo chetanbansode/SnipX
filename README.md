@@ -1,48 +1,53 @@
-# SnipX 📸
+# SnipX
 
-**The missing auto-save feature for Windows 10 Snip & Sketch.**
+A lightweight, native background utility that introduces automated file-saving for the Windows 10 Snip & Sketch clipboard utility (`Win + Shift + S`).
 
-If you use Windows 10, you probably love the `Win + Shift + S` shortcut for quick screenshots. But there's a catch: Windows copies the snip to your clipboard, but **it doesn't save it as a file automatically**. You have to open an image editor, paste it, and manually save it every single time. 
+By default, Windows 10 only copies captured snips to the system clipboard, requiring manual pasting and saving via an image editor. SnipX intercepts this workflow natively, capturing the clipboard buffer and persisting it to disk automatically.
 
-**SnipX** (X for Windows 10) runs invisibly in the background and fixes this natively. It effortlessly catches your `Win + Shift + S` screenshots and immediately saves them as PNG files directly to your **Pictures\Screenshots** folder.
+## Architecture & Features
 
-## ✨ Features
-- **Smart Filtering**: Only saves actual screenshots triggered by `Win + Shift + S`. It completely ignores normal images you copy from Chrome, Photoshop, or WhatsApp, keeping your computer clutter-free.
-- **Zero Interruption**: Your screenshots are still copied to your clipboard normally, so you can paste them immediately into your chats or documents, while a backup is quietly saved.
-- **Ultra-Lightweight**: Uses 0% CPU and a microscopic amount of memory. It runs completely invisibly with no system tray icon or annoying console window.
-- **Native & Efficient**: Built in C# .NET using lightweight Win32 API hooks (`GetAsyncKeyState` and `GetClipboardSequenceNumber`), meaning it won't trigger anti-cheat software or cause input lag.
+- **Heuristic Clipboard Filtering**: SnipX selectively persists images only when the `Win + Shift + S` sequence is detected. Standard clipboard copy events (e.g., from web browsers or design software) are ignored to prevent storage bloat.
+- **Asynchronous Execution**: Operates completely in the background as a headless process with zero graphical user interface (GUI) or system tray footprint.
+- **Native Implementation**: Built on C# .NET leveraging low-level Win32 API hooks (`GetAsyncKeyState` and `GetClipboardSequenceNumber`) to ensure minimal latency and zero CPU idle overhead.
+- **Fault-Tolerant File I/O**: Incorporates robust exception handling for file system operations. Invalid paths or permission failures silently fallback to the default directory to guarantee no data loss.
 
-## 🚀 Which version should I download?
-Head over to the Releases tab and choose the version that fits your needs:
-- **`SnipX-x64.exe`** (Tiny ~150KB): Requires the **.NET 8 Desktop Runtime** installed on your PC.
-- **`SnipX_RE-x64.exe`** (Large ~65MB): A fully self-contained package. No installation or .NET required. Just download and run!
+## Installation & Deployment
 
-## 🚀 How to use
-1. Download and run your preferred `.exe` from the Releases page. (Nothing will appear on your screen, it runs silently in the background).
-2. Press `Win + Shift + S` and take a snip.
-3. Check your **Pictures\Screenshots** folder! You'll find a new `Screenshot_YYYY-MM-DD...png` waiting for you.
+Two builds are provided in the Releases section to accommodate different deployment environments:
 
-To stop the background process, open **Task Manager** (`Ctrl + Shift + Esc`), find `SnipX` in your Background Processes, and click "End task".
+- **`SnipX-x64.exe`** (~150 KB): Framework-dependent deployment. Requires the [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
+- **`SnipX_RE-x64.exe`** (~65 MB): Self-contained deployment. Pre-packaged with the .NET runtime and native dependencies. No prior framework installation required.
 
-## ⚙️ Custom Save Directory
-By default, SnipX saves screenshots to your **Pictures\Screenshots** folder. If you want to change this to a custom folder (e.g. `D:\MySnips`):
-1. Create a simple text file named `savepath.txt` in the exact same folder where your `SnipX.exe` is located.
-2. Open `savepath.txt` and paste the full path of your desired folder on the first line.
-3. Restart SnipX!
+## Usage
 
-## 🛠️ Building from source
-Make sure you have the .NET 8 SDK installed.
+1. Execute the desired binary. The process will run silently in the background.
+2. Trigger the native Windows snip tool via `Win + Shift + S` and capture an area.
+3. The image is immediately written to `%USERPROFILE%\Pictures\Screenshots` (or your configured target).
+
+To terminate the process, open **Task Manager** (`taskmgr.exe`), locate the `SnipX` background process, and terminate it.
+
+## Configuration
+
+By default, SnipX resolves the output directory to the current user's `Pictures\Screenshots` folder. To override this behavior:
+
+1. Create a plain text file named `savepath.txt` in the executing directory of the binary.
+2. Specify the absolute path of the target directory on the first line (e.g., `D:\Output\Screenshots`).
+3. Restart the `SnipX` process.
+
+*Note: If the specified path does not exist, the application will attempt to create the directory tree recursively. If directory creation fails due to invalid characters or insufficient permissions, the application safely falls back to the default directory.*
+
+## Build Instructions
+
+To compile the source code, ensure the .NET 8 SDK is installed on the host machine.
 
 ```bash
-# Build normally (Framework Dependent)
+# Compile standard framework-dependent binary
 dotnet build -c Release
 
-# Build a standalone compressed executable (No .NET installation required for end-users)
+# Publish as a self-contained, single-file compressed executable
 dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true
 ```
 
-## 🤝 Contributing
-Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
+## License
 
-## 📜 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is distributed under the MIT License. See the [LICENSE](LICENSE) file for more information.
