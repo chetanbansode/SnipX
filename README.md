@@ -34,7 +34,7 @@ By default, SnipX resolves the output directory to the current user's `Pictures\
 2. Specify the absolute path of the target directory on the first line (e.g., `D:\Output\Screenshots`).
 3. Restart the `SnipX` process.
 
-Note: If the specified path does not exist, the application will attempt to create the directory tree recursively. If directory creation fails due to invalid characters or insufficient permissions, the application safely falls back to the default directory.
+**Note**: If the specified path does not exist, the application will attempt to create the directory tree recursively. If directory creation fails due to invalid characters or insufficient permissions, the application safely falls back to the default directory.
 
 ## Build Instructions
 
