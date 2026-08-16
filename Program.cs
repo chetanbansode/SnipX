@@ -100,9 +100,40 @@ namespace SnipX
                 {
                     if (img != null)
                     {
-                        string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                        string saveDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Screenshots");
+                        if (!Directory.Exists(saveDir))
+                        {
+                            Directory.CreateDirectory(saveDir);
+                        }
+                        
+                        // Check for custom save path config
+                        string exeDir = Path.GetDirectoryName(Environment.ProcessPath);
+                        string configPath = Path.Combine(exeDir, "savepath.txt");
+                        
+                        if (File.Exists(configPath))
+                        {
+                            string[] lines = File.ReadAllLines(configPath);
+                            if (lines.Length > 0)
+                            {
+                                string customPath = lines[0].Replace("\uFEFF", "").Trim();
+                                if (!string.IsNullOrWhiteSpace(customPath))
+                                {
+                                    try
+                                    {
+                                        // This will create the directory if it doesn't exist, and do nothing if it does.
+                                        Directory.CreateDirectory(customPath);
+                                        saveDir = customPath;
+                                    }
+                                    catch (Exception)
+                                    {
+                                        // Fallback to default if path is completely invalid or we lack permissions
+                                    }
+                                }
+                            }
+                        }
+
                         string fileName = $"Screenshot_{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fff}.png";
-                        string fullPath = Path.Combine(desktopPath, fileName);
+                        string fullPath = Path.Combine(saveDir, fileName);
                         
                         // Create a new Bitmap to avoid any clipboard locking issues
                         using (Bitmap bmp = new Bitmap(img))
